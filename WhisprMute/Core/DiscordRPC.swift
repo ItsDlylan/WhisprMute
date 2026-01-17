@@ -81,11 +81,9 @@ class DiscordRPC {
     }
 
     private func sendHandshake() -> Bool {
-        // Handshake requires a client_id - using a placeholder for testing
-        // In production, you'd register an app at discord.com/developers
         let handshake: [String: Any] = [
             "v": 1,
-            "client_id": "1234567890"  // Placeholder - needs real client ID
+            "client_id": "1462209836644176025"
         ]
 
         guard let jsonData = try? JSONSerialization.data(withJSONObject: handshake),
