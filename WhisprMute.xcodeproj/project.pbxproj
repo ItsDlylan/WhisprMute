@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		A1000001241B0A0000000001 /* WhisprMuteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002241B0A0000000001 /* WhisprMuteApp.swift */; };
 		A1000003241B0A0000000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000004241B0A0000000001 /* AppDelegate.swift */; };
-		A1000005241B0A0000000001 /* MicrophoneMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006241B0A0000000001 /* MicrophoneMonitor.swift */; };
+		A1000005241B0A0000000001 /* AudioLogMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006241B0A0000000001 /* AudioLogMonitor.swift */; };
 		A1000007241B0A0000000001 /* WisprFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008241B0A0000000001 /* WisprFlowDetector.swift */; };
 		A1000009241B0A0000000001 /* MeetingAppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000010241B0A0000000001 /* MeetingAppController.swift */; };
 		A1000011241B0A0000000001 /* MeetingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000012241B0A0000000001 /* MeetingApp.swift */; };
@@ -31,7 +31,7 @@
 		A1000000241B0A0000000000 /* WhisprMute.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhisprMute.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000002241B0A0000000001 /* WhisprMuteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisprMuteApp.swift; sourceTree = "<group>"; };
 		A1000004241B0A0000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A1000006241B0A0000000001 /* MicrophoneMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrophoneMonitor.swift; sourceTree = "<group>"; };
+		A1000006241B0A0000000001 /* AudioLogMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLogMonitor.swift; sourceTree = "<group>"; };
 		A1000008241B0A0000000001 /* WisprFlowDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WisprFlowDetector.swift; sourceTree = "<group>"; };
 		A1000010241B0A0000000001 /* MeetingAppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingAppController.swift; sourceTree = "<group>"; };
 		A1000012241B0A0000000001 /* MeetingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingApp.swift; sourceTree = "<group>"; };
@@ -113,7 +113,7 @@
 		A1000055241B0A0000000001 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				A1000006241B0A0000000001 /* MicrophoneMonitor.swift */,
+				A1000006241B0A0000000001 /* AudioLogMonitor.swift */,
 				A1000008241B0A0000000001 /* WisprFlowDetector.swift */,
 				A1000010241B0A0000000001 /* MeetingAppController.swift */,
 			);
@@ -224,7 +224,7 @@
 			files = (
 				A1000001241B0A0000000001 /* WhisprMuteApp.swift in Sources */,
 				A1000003241B0A0000000001 /* AppDelegate.swift in Sources */,
-				A1000005241B0A0000000001 /* MicrophoneMonitor.swift in Sources */,
+				A1000005241B0A0000000001 /* AudioLogMonitor.swift in Sources */,
 				A1000007241B0A0000000001 /* WisprFlowDetector.swift in Sources */,
 				A1000009241B0A0000000001 /* MeetingAppController.swift in Sources */,
 				A1000011241B0A0000000001 /* MeetingApp.swift in Sources */,

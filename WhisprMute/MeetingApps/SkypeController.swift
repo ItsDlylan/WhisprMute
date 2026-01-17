@@ -11,19 +11,12 @@ class SkypeController: MeetingAppControllable {
 
     func mute() -> Bool {
         // Skype uses Cmd+Shift+M for mute
-        let script = """
-        tell application "Skype"
-            activate
-        end tell
-        delay 0.1
-        tell application "System Events"
-            tell process "Skype"
-                keystroke "m" using {command down, shift down}
-            end tell
-        end tell
-        """
-
-        return runAppleScript(script)
+        // Send keystroke directly without stealing focus
+        return sendKeyboardShortcut(
+            keyCode: 0x2E, // 'M' key
+            modifiers: [.maskCommand, .maskShift],
+            to: appType.bundleIdentifier
+        )
     }
 
     func unmute() -> Bool {

@@ -39,19 +39,12 @@ class WebexController: MeetingAppControllable {
 
     func mute() -> Bool {
         // Webex uses Ctrl+M for mute
-        let script = """
-        tell application "Webex"
-            activate
-        end tell
-        delay 0.1
-        tell application "System Events"
-            tell process "Webex"
-                keystroke "m" using {control down}
-            end tell
-        end tell
-        """
-
-        return runAppleScript(script)
+        // Send keystroke directly without stealing focus
+        return sendKeyboardShortcut(
+            keyCode: 0x2E, // 'M' key
+            modifiers: [.maskControl],
+            to: appType.bundleIdentifier
+        )
     }
 
     func unmute() -> Bool {

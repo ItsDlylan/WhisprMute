@@ -2,75 +2,66 @@ import Foundation
 import AppKit
 
 class WisprFlowDetector {
-    private let microphoneMonitor: MicrophoneMonitor
-    private var pollingTimer: Timer?
+    private let audioLogMonitor: AudioLogMonitor
+    private var currentMicClientPID: pid_t?
+    private var currentMicClientName: String?
     private var lastWisprFlowActive: Bool = false
 
     var onWisprFlowStateChanged: ((Bool) -> Void)?
 
-    private let wisprProcessNames = [
-        "Wispr Flow",
-        "WisprFlow",
-        "wispr",
-        "Wispr",
-        "flow",
-        "Wispr Flow Helper"
-    ]
-
-    init(microphoneMonitor: MicrophoneMonitor) {
-        self.microphoneMonitor = microphoneMonitor
-
-        microphoneMonitor.onMicrophoneUsageChanged = { [weak self] processes in
-            self?.checkForWisprFlow(in: processes)
-        }
-
-        startPolling()
+    init() {
+        self.audioLogMonitor = AudioLogMonitor()
+        setupMonitoring()
     }
 
-    private func startPolling() {
-        pollingTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { [weak self] _ in
-            self?.pollWisprFlowStatus()
-        }
-    }
+    private func setupMonitoring() {
+        audioLogMonitor.onMicrophoneClientChanged = { [weak self] pid, processName in
+            guard let self = self else { return }
 
-    private func pollWisprFlowStatus() {
-        let processes = microphoneMonitor.getProcessesUsingMicrophone()
-        checkForWisprFlow(in: processes)
-    }
+            self.currentMicClientPID = pid
+            self.currentMicClientName = processName
 
-    private func checkForWisprFlow(in processes: [MicrophoneMonitor.MicrophoneProcess]) {
-        let wisprFlowActive = processes.contains { process in
-            wisprProcessNames.contains { wisprName in
-                process.name.localizedCaseInsensitiveContains(wisprName)
+            let isWisprFlow = self.isWisprFlowProcess(name: processName)
+
+            if isWisprFlow != self.lastWisprFlowActive {
+                self.lastWisprFlowActive = isWisprFlow
+                DispatchQueue.main.async {
+                    self.onWisprFlowStateChanged?(isWisprFlow)
+                }
             }
         }
+    }
 
-        if wisprFlowActive != lastWisprFlowActive {
-            lastWisprFlowActive = wisprFlowActive
-            onWisprFlowStateChanged?(wisprFlowActive)
+    func startMonitoring() {
+        audioLogMonitor.startMonitoring()
+    }
+
+    func stopMonitoring() {
+        audioLogMonitor.stopMonitoring()
+    }
+
+    func isWisprFlowRecording() -> Bool {
+        guard let client = audioLogMonitor.getCurrentMicrophoneClient() else {
+            return false
         }
+        return isWisprFlowProcess(name: client.name)
+    }
+
+    private func isWisprFlowProcess(name: String?) -> Bool {
+        guard let name = name else { return false }
+        return name.localizedCaseInsensitiveContains("Wispr Flow") ||
+               name.localizedCaseInsensitiveContains("WisprFlow")
     }
 
     func isWisprFlowRunning() -> Bool {
         let runningApps = NSWorkspace.shared.runningApplications
         return runningApps.contains { app in
             guard let name = app.localizedName else { return false }
-            return wisprProcessNames.contains { wisprName in
-                name.localizedCaseInsensitiveContains(wisprName)
-            }
-        }
-    }
-
-    func isWisprFlowUsingMicrophone() -> Bool {
-        let processes = microphoneMonitor.getProcessesUsingMicrophone()
-        return processes.contains { process in
-            wisprProcessNames.contains { wisprName in
-                process.name.localizedCaseInsensitiveContains(wisprName)
-            }
+            return name.localizedCaseInsensitiveContains("Wispr Flow")
         }
     }
 
     deinit {
-        pollingTimer?.invalidate()
+        stopMonitoring()
     }
 }

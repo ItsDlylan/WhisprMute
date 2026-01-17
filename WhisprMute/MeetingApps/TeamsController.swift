@@ -43,19 +43,12 @@ class TeamsController: MeetingAppControllable {
 
     func mute() -> Bool {
         // Teams uses Cmd+Shift+M for mute toggle during meetings
-        let script = """
-        tell application "Microsoft Teams"
-            activate
-        end tell
-        delay 0.1
-        tell application "System Events"
-            tell process "Microsoft Teams"
-                keystroke "m" using {command down, shift down}
-            end tell
-        end tell
-        """
-
-        return runAppleScript(script)
+        // Send keystroke directly without stealing focus
+        return sendKeyboardShortcut(
+            keyCode: 0x2E, // 'M' key
+            modifiers: [.maskCommand, .maskShift],
+            to: appType.bundleIdentifier
+        )
     }
 
     func unmute() -> Bool {

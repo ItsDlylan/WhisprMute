@@ -6,7 +6,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var popover: NSPopover!
     let appState = AppState()
 
-    private var microphoneMonitor: MicrophoneMonitor!
     private var wisprFlowDetector: WisprFlowDetector!
     private var meetingAppController: MeetingAppController!
     private var meetingAppPollingTimer: Timer?
@@ -36,19 +35,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupServices() {
-        microphoneMonitor = MicrophoneMonitor()
-        wisprFlowDetector = WisprFlowDetector(microphoneMonitor: microphoneMonitor)
+        wisprFlowDetector = WisprFlowDetector()
         meetingAppController = MeetingAppController(appState: appState)
 
         wisprFlowDetector.onWisprFlowStateChanged = { [weak self] isActive in
-            DispatchQueue.main.async {
-                self?.handleWisprFlowStateChange(isActive: isActive)
-            }
+            self?.handleWisprFlowStateChange(isActive: isActive)
         }
     }
 
     private func startMonitoring() {
-        microphoneMonitor.startMonitoring()
+        wisprFlowDetector.startMonitoring()
 
         meetingAppPollingTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
             self?.updateDetectedMeetingApps()
@@ -113,7 +109,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         meetingAppPollingTimer?.invalidate()
-        microphoneMonitor.stopMonitoring()
+        wisprFlowDetector.stopMonitoring()
 
         if appState.isWisprFlowActive {
             meetingAppController.restoreMuteStates()
