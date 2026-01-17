@@ -6,21 +6,34 @@ class DiscordRPC {
     private var isAuthenticated = false
     private var accessToken: String?
 
-    // Client ID loaded from environment or config file
-    private let clientId: String? = {
+    // Load config from ~/.whisprmute
+    private static func loadConfig() -> [String: String] {
+        var config: [String: String] = [:]
+
+        // Environment variables take precedence
         if let envId = ProcessInfo.processInfo.environment["DISCORD_CLIENT_ID"] {
-            return envId
+            config["client_id"] = envId
         }
+        if let envSecret = ProcessInfo.processInfo.environment["DISCORD_CLIENT_SECRET"] {
+            config["client_secret"] = envSecret
+        }
+
+        // Load from config file
         let configPath = NSHomeDirectory() + "/.whisprmute"
-        if let config = try? String(contentsOfFile: configPath, encoding: .utf8) {
-            for line in config.components(separatedBy: "\n") {
-                if line.hasPrefix("DISCORD_CLIENT_ID=") {
-                    return String(line.dropFirst("DISCORD_CLIENT_ID=".count)).trimmingCharacters(in: .whitespaces)
+        if let fileContent = try? String(contentsOfFile: configPath, encoding: .utf8) {
+            for line in fileContent.components(separatedBy: "\n") {
+                if line.hasPrefix("DISCORD_CLIENT_ID=") && config["client_id"] == nil {
+                    config["client_id"] = String(line.dropFirst("DISCORD_CLIENT_ID=".count)).trimmingCharacters(in: .whitespaces)
+                } else if line.hasPrefix("DISCORD_CLIENT_SECRET=") && config["client_secret"] == nil {
+                    config["client_secret"] = String(line.dropFirst("DISCORD_CLIENT_SECRET=".count)).trimmingCharacters(in: .whitespaces)
                 }
             }
         }
-        return nil
-    }()
+        return config
+    }
+
+    private let clientId: String? = loadConfig()["client_id"]
+    private let clientSecret: String? = loadConfig()["client_secret"]
 
     // Load saved access token
     private var savedAccessToken: String? {
@@ -48,6 +61,7 @@ class DiscordRPC {
 
     init() {
         print("[DiscordRPC] Client ID: \(clientId ?? "NOT SET")")
+        print("[DiscordRPC] Client Secret: \(clientSecret != nil ? "configured" : "NOT SET")")
         accessToken = savedAccessToken
         if accessToken != nil {
             print("[DiscordRPC] Found saved access token")
@@ -159,7 +173,14 @@ class DiscordRPC {
     }
 
     private func authorize() -> Bool {
-        guard let clientId = clientId else { return false }
+        guard let clientId = clientId else {
+            print("[DiscordRPC] No client ID configured")
+            return false
+        }
+        guard let clientSecret = clientSecret else {
+            print("[DiscordRPC] No client secret configured - add DISCORD_CLIENT_SECRET to ~/.whisprmute")
+            return false
+        }
 
         print("[DiscordRPC] Requesting authorization (check Discord for prompt)...")
 
@@ -177,20 +198,64 @@ class DiscordRPC {
                    let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let dataObj = json["data"] as? [String: Any],
                    let code = dataObj["code"] as? String {
-                    print("[DiscordRPC] Got authorization code")
+                    print("[DiscordRPC] Got authorization code, exchanging for access token...")
 
-                    // For RPC, we can use the code directly with AUTHENTICATE
-                    // The code IS the access token for local RPC
-                    accessToken = code
-                    savedAccessToken = code
-
-                    return authenticate(with: code)
+                    // Exchange authorization code for access token
+                    if let token = exchangeCodeForToken(code: code, clientId: clientId, clientSecret: clientSecret) {
+                        print("[DiscordRPC] Got access token")
+                        accessToken = token
+                        savedAccessToken = token
+                        return authenticate(with: token)
+                    } else {
+                        print("[DiscordRPC] Failed to exchange code for token")
+                    }
                 } else if response.contains("ERROR") {
                     print("[DiscordRPC] Authorization denied or error")
                 }
             }
         }
         return false
+    }
+
+    private func exchangeCodeForToken(code: String, clientId: String, clientSecret: String) -> String? {
+        let url = URL(string: "https://discord.com/api/oauth2/token")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+
+        let body = "client_id=\(clientId)&client_secret=\(clientSecret)&grant_type=authorization_code&code=\(code)"
+        request.httpBody = body.data(using: .utf8)
+
+        var accessToken: String?
+        let semaphore = DispatchSemaphore(value: 0)
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            defer { semaphore.signal() }
+
+            if let error = error {
+                print("[DiscordRPC] Token exchange error: \(error)")
+                return
+            }
+
+            guard let data = data else {
+                print("[DiscordRPC] No data from token exchange")
+                return
+            }
+
+            if let responseStr = String(data: data, encoding: .utf8) {
+                print("[DiscordRPC] Token exchange response: \(responseStr.prefix(200))...")
+            }
+
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let token = json["access_token"] as? String {
+                accessToken = token
+            }
+        }
+
+        task.resume()
+        _ = semaphore.wait(timeout: .now() + 10)
+
+        return accessToken
     }
 
     private func authenticate(with token: String) -> Bool {
