@@ -1,31 +1,37 @@
 # WhisprMute
 
-A macOS menu bar app that automatically mutes your microphone in meeting apps when Wispr Flow is actively recording, then unmutes when done.
+A macOS menu bar app that automatically mutes your microphone in meeting apps when [Wispr Flow](https://wispr.com) is actively recording, then unmutes when done.
 
-## Features
+## The Problem
 
-- **Automatic Muting**: Detects when Wispr Flow starts using the microphone and automatically mutes supported meeting apps
-- **Smart Restoration**: Only unmutes apps that were unmuted before muting - preserves your intentional mute states
-- **Menu Bar Integration**: Clean menu bar icon with status indication
-- **Per-App Control**: Enable/disable automatic muting for each meeting app individually
-- **Multiple App Support**: Works with Zoom, Discord, Slack, Microsoft Teams, Google Meet, Webex, and Skype
+You're a developer in a meeting, but you also need to get work done. You use Wispr Flow to dictate code, messages, or notes - but every time you start dictating, your teammates hear you talking to your AI assistant. You have to remember to mute yourself first, then unmute after. It's disruptive and easy to forget.
+
+## The Solution
+
+WhisprMute runs silently in your menu bar and automatically:
+1. Detects when Wispr Flow starts recording (in real-time via macOS system logs)
+2. Instantly mutes your microphone in your meeting apps
+3. Unmutes when you're done dictating
+
+No manual muting. No embarrassing moments. Just seamless dictation while in meetings.
 
 ## Supported Meeting Apps
 
-| App | Mute Method |
-|-----|-------------|
-| Zoom | Menu bar control via AppleScript |
-| Discord | Keyboard shortcut (Cmd+Shift+M) |
-| Slack | Keyboard shortcut (M in huddle) |
-| Microsoft Teams | Keyboard shortcut (Cmd+Shift+M) |
-| Google Meet | Browser tab detection + Cmd+D |
-| Webex | Keyboard shortcut (Ctrl+M) |
-| Skype | Keyboard shortcut (Cmd+Shift+M) |
+| App | Status | Mute Method |
+|-----|--------|-------------|
+| Discord | **Fully Supported** | Discord RPC API (native integration) |
+| Google Meet | In Development | Coming soon |
+| Zoom | In Development | Coming soon |
+| Slack | Planned | - |
+| Microsoft Teams | Planned | - |
+| Webex | Planned | - |
+| Skype | Planned | - |
 
 ## Requirements
 
-- macOS 13.0 or later
-- Xcode 15.0 or later (for building)
+- macOS 14.0 (Sonoma) or later
+- [Wispr Flow](https://wispr.com) installed
+- Discord desktop app (for Discord support)
 
 ## Installation
 
@@ -44,84 +50,79 @@ A macOS menu bar app that automatically mutes your microphone in meeting apps wh
 
 3. Build and run (Cmd+R)
 
+### Discord Setup
+
+WhisprMute uses Discord's RPC API for native mute control. You'll need to set up a Discord application:
+
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Create a new application
+3. Copy your **Application ID** and **Client Secret** from OAuth2
+4. Add `http://localhost` as a redirect URI in OAuth2 settings
+5. Create a config file at `~/.whisprmute`:
+   ```
+   DISCORD_CLIENT_ID=your_application_id
+   DISCORD_CLIENT_SECRET=your_client_secret
+   ```
+6. On first run, Discord will prompt you to authorize WhisprMute
+
 ### Required Permissions
 
-WhisprMute needs the following permissions to function:
-
-1. **Accessibility**: Required to control mute buttons in other apps
-   - Go to System Settings > Privacy & Security > Accessibility
-   - Add WhisprMute to the list
-
-2. **Automation**: Required to send commands to meeting apps
-   - macOS will prompt you when WhisprMute first tries to control each app
-   - Click "OK" to allow
+WhisprMute needs **Accessibility** permissions to function:
+- Go to System Settings > Privacy & Security > Accessibility
+- Add WhisprMute to the list
 
 ## Usage
 
-1. Launch WhisprMute - it will appear in your menu bar
-2. Click the menu bar icon to see the current status
-3. Enable/disable the feature with the toggle
-4. Start a meeting in any supported app
-5. When you activate Wispr Flow dictation:
-   - Your meeting apps will automatically mute
-   - The menu bar icon will change to indicate active muting
-6. When dictation completes:
-   - Apps that were unmuted will be restored to unmuted
-   - Apps that were already muted will stay muted
+1. Launch WhisprMute - it appears in your menu bar
+2. Join a Discord voice channel
+3. Start dictating with Wispr Flow
+4. WhisprMute automatically mutes you in Discord
+5. When dictation stops, you're automatically unmuted
+
+Your teammates never hear your dictation. You stay productive.
+
+## How It Works
+
+1. **Real-time Log Monitoring**: Uses `log stream` to monitor macOS system logs from `com.apple.coremedia` subsystem for Wispr Flow recording state changes - provides instant detection with no polling delay
+
+2. **Discord RPC Integration**: Connects to Discord's local IPC socket and uses the RPC API with OAuth2 authentication to control mute state - no keyboard shortcuts or focus stealing
+
+3. **Smart State Management**: Remembers which apps were already muted before Wispr Flow started, and only unmutes apps that were previously unmuted
 
 ## Architecture
 
 ```
 WhisprMute/
 ├── App/
-│   ├── WhisprMuteApp.swift      # Main app entry
-│   └── AppDelegate.swift        # Menu bar setup & coordination
+│   ├── WhisprMuteApp.swift       # Main app entry
+│   └── AppDelegate.swift         # Menu bar setup & coordination
 ├── Core/
-│   ├── MicrophoneMonitor.swift  # Core Audio mic monitoring
-│   ├── WisprFlowDetector.swift  # Wispr Flow activity detection
-│   └── MeetingAppController.swift # Mute/unmute orchestration
+│   ├── AudioLogMonitor.swift     # Real-time log stream monitoring
+│   ├── WisprFlowDetector.swift   # Wispr Flow activity detection
+│   ├── MeetingAppController.swift # Mute/unmute orchestration
+│   └── DiscordRPC.swift          # Discord RPC client with OAuth2
 ├── MeetingApps/
-│   ├── MeetingApp.swift         # Protocol for meeting apps
-│   ├── ZoomController.swift     # Zoom-specific mute
-│   ├── DiscordController.swift  # Discord-specific mute
-│   ├── SlackController.swift    # Slack-specific mute
-│   ├── TeamsController.swift    # Teams-specific mute
-│   ├── GoogleMeetController.swift # Meet-specific mute
-│   ├── WebexController.swift    # Webex-specific mute
-│   └── SkypeController.swift    # Skype-specific mute
-├── UI/
-│   ├── MenuBarView.swift        # Menu bar icon and menu
-│   └── SettingsView.swift       # Settings window
-└── Resources/
-    ├── Assets.xcassets          # Icons
-    ├── Info.plist               # App configuration
-    └── WhisprMute.entitlements  # App permissions
+│   ├── MeetingApp.swift          # Protocol & base implementation
+│   ├── DiscordController.swift   # Discord via RPC API
+│   └── ...                       # Other app controllers
+└── UI/
+    ├── MenuBarView.swift         # Menu bar icon and menu
+    └── SettingsView.swift        # Settings window
 ```
-
-## How It Works
-
-1. **Microphone Monitoring**: Uses Core Audio APIs and process detection to monitor which applications are using the microphone
-
-2. **Wispr Flow Detection**: Specifically watches for the "Wispr Flow" process using the microphone, indicating dictation has begun
-
-3. **Meeting App Control**: When Wispr Flow activates:
-   - Stores current mute state of each running meeting app
-   - Mutes all meeting apps that were unmuted
-   - When Wispr Flow stops, restores previous mute states
 
 ## Troubleshooting
 
-### App not muting correctly
+### Discord not muting
 
-1. Ensure WhisprMute has Accessibility permissions
-2. Try the "Open Settings" button in the Permissions tab
-3. Remove and re-add WhisprMute from Accessibility list
+1. Ensure you've set up `~/.whisprmute` with your Discord credentials
+2. Check that you've added `http://localhost` as a redirect URI in Discord Developer Portal
+3. Delete `~/.whisprmute_token` to force re-authorization
+4. Make sure you're in a voice channel when testing
 
 ### Wispr Flow not detected
 
 1. Make sure Wispr Flow is running
-2. Ensure Wispr Flow is using the microphone when dictating
-3. Check that WhisprMute's monitoring is enabled (toggle in menu bar dropdown)
+2. WhisprMute uses real-time log streaming - check Console.app for `com.apple.coremedia` logs mentioning "Wispr Flow"
 
 ## License
 
@@ -129,4 +130,9 @@ MIT License - see LICENSE file for details.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! We're especially looking for help with:
+- Google Meet integration (browser-based, needs creative solution)
+- Zoom integration
+- Other meeting app support
+
+Please feel free to submit a Pull Request.
