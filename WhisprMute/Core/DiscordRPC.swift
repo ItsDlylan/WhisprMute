@@ -4,6 +4,24 @@ class DiscordRPC {
     private var socket: Int32 = -1
     private var isConnected = false
 
+    // Client ID loaded from environment or config file
+    private let clientId: String? = {
+        // Try environment variable first
+        if let envId = ProcessInfo.processInfo.environment["DISCORD_CLIENT_ID"] {
+            return envId
+        }
+        // Try loading from ~/.whisprmute config file
+        let configPath = NSHomeDirectory() + "/.whisprmute"
+        if let config = try? String(contentsOfFile: configPath, encoding: .utf8) {
+            for line in config.components(separatedBy: "\n") {
+                if line.hasPrefix("DISCORD_CLIENT_ID=") {
+                    return String(line.dropFirst("DISCORD_CLIENT_ID=".count)).trimmingCharacters(in: .whitespaces)
+                }
+            }
+        }
+        return nil
+    }()
+
     // Discord RPC opcodes
     private enum Opcode: UInt32 {
         case handshake = 0
@@ -81,9 +99,14 @@ class DiscordRPC {
     }
 
     private func sendHandshake() -> Bool {
+        guard let clientId = clientId else {
+            print("[DiscordRPC] No client ID configured. Set DISCORD_CLIENT_ID env var or add to ~/.whisprmute")
+            return false
+        }
+
         let handshake: [String: Any] = [
             "v": 1,
-            "client_id": "1462209836644176025"
+            "client_id": clientId
         ]
 
         guard let jsonData = try? JSONSerialization.data(withJSONObject: handshake),
