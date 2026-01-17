@@ -1,0 +1,442 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1000001241B0A0000000001 /* WhisprMuteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002241B0A0000000001 /* WhisprMuteApp.swift */; };
+		A1000003241B0A0000000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000004241B0A0000000001 /* AppDelegate.swift */; };
+		A1000005241B0A0000000001 /* MicrophoneMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006241B0A0000000001 /* MicrophoneMonitor.swift */; };
+		A1000007241B0A0000000001 /* WisprFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008241B0A0000000001 /* WisprFlowDetector.swift */; };
+		A1000009241B0A0000000001 /* MeetingAppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000010241B0A0000000001 /* MeetingAppController.swift */; };
+		A1000011241B0A0000000001 /* MeetingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000012241B0A0000000001 /* MeetingApp.swift */; };
+		A1000013241B0A0000000001 /* ZoomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000014241B0A0000000001 /* ZoomController.swift */; };
+		A1000015241B0A0000000001 /* DiscordController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000016241B0A0000000001 /* DiscordController.swift */; };
+		A1000017241B0A0000000001 /* SlackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000018241B0A0000000001 /* SlackController.swift */; };
+		A1000019241B0A0000000001 /* TeamsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000020241B0A0000000001 /* TeamsController.swift */; };
+		A1000021241B0A0000000001 /* GoogleMeetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000022241B0A0000000001 /* GoogleMeetController.swift */; };
+		A1000023241B0A0000000001 /* WebexController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000024241B0A0000000001 /* WebexController.swift */; };
+		A1000025241B0A0000000001 /* SkypeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000026241B0A0000000001 /* SkypeController.swift */; };
+		A1000027241B0A0000000001 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000028241B0A0000000001 /* MenuBarView.swift */; };
+		A1000029241B0A0000000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000030241B0A0000000001 /* SettingsView.swift */; };
+		A1000031241B0A0000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000032241B0A0000000001 /* Assets.xcassets */; };
+		A1000033241B0A0000000001 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000034241B0A0000000001 /* CoreAudio.framework */; };
+		A1000035241B0A0000000001 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000036241B0A0000000001 /* AVFoundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A1000000241B0A0000000000 /* WhisprMute.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhisprMute.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1000002241B0A0000000001 /* WhisprMuteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisprMuteApp.swift; sourceTree = "<group>"; };
+		A1000004241B0A0000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A1000006241B0A0000000001 /* MicrophoneMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrophoneMonitor.swift; sourceTree = "<group>"; };
+		A1000008241B0A0000000001 /* WisprFlowDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WisprFlowDetector.swift; sourceTree = "<group>"; };
+		A1000010241B0A0000000001 /* MeetingAppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingAppController.swift; sourceTree = "<group>"; };
+		A1000012241B0A0000000001 /* MeetingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingApp.swift; sourceTree = "<group>"; };
+		A1000014241B0A0000000001 /* ZoomController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomController.swift; sourceTree = "<group>"; };
+		A1000016241B0A0000000001 /* DiscordController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscordController.swift; sourceTree = "<group>"; };
+		A1000018241B0A0000000001 /* SlackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackController.swift; sourceTree = "<group>"; };
+		A1000020241B0A0000000001 /* TeamsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsController.swift; sourceTree = "<group>"; };
+		A1000022241B0A0000000001 /* GoogleMeetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMeetController.swift; sourceTree = "<group>"; };
+		A1000024241B0A0000000001 /* WebexController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebexController.swift; sourceTree = "<group>"; };
+		A1000026241B0A0000000001 /* SkypeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkypeController.swift; sourceTree = "<group>"; };
+		A1000028241B0A0000000001 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		A1000030241B0A0000000001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1000032241B0A0000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1000034241B0A0000000001 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		A1000036241B0A0000000001 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A1000038241B0A0000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1000040241B0A0000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000033241B0A0000000001 /* CoreAudio.framework in Frameworks */,
+				A1000035241B0A0000000001 /* AVFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1000050241B0A0000000001 = {
+			isa = PBXGroup;
+			children = (
+				A1000051241B0A0000000001 /* WhisprMute */,
+				A1000052241B0A0000000001 /* Frameworks */,
+				A1000053241B0A0000000001 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1000051241B0A0000000001 /* WhisprMute */ = {
+			isa = PBXGroup;
+			children = (
+				A1000054241B0A0000000001 /* App */,
+				A1000055241B0A0000000001 /* Core */,
+				A1000056241B0A0000000001 /* MeetingApps */,
+				A1000057241B0A0000000001 /* UI */,
+				A1000058241B0A0000000001 /* Resources */,
+			);
+			path = WhisprMute;
+			sourceTree = "<group>";
+		};
+		A1000052241B0A0000000001 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A1000034241B0A0000000001 /* CoreAudio.framework */,
+				A1000036241B0A0000000001 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A1000053241B0A0000000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1000000241B0A0000000000 /* WhisprMute.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1000054241B0A0000000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A1000002241B0A0000000001 /* WhisprMuteApp.swift */,
+				A1000004241B0A0000000001 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A1000055241B0A0000000001 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A1000006241B0A0000000001 /* MicrophoneMonitor.swift */,
+				A1000008241B0A0000000001 /* WisprFlowDetector.swift */,
+				A1000010241B0A0000000001 /* MeetingAppController.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A1000056241B0A0000000001 /* MeetingApps */ = {
+			isa = PBXGroup;
+			children = (
+				A1000012241B0A0000000001 /* MeetingApp.swift */,
+				A1000014241B0A0000000001 /* ZoomController.swift */,
+				A1000016241B0A0000000001 /* DiscordController.swift */,
+				A1000018241B0A0000000001 /* SlackController.swift */,
+				A1000020241B0A0000000001 /* TeamsController.swift */,
+				A1000022241B0A0000000001 /* GoogleMeetController.swift */,
+				A1000024241B0A0000000001 /* WebexController.swift */,
+				A1000026241B0A0000000001 /* SkypeController.swift */,
+			);
+			path = MeetingApps;
+			sourceTree = "<group>";
+		};
+		A1000057241B0A0000000001 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				A1000028241B0A0000000001 /* MenuBarView.swift */,
+				A1000030241B0A0000000001 /* SettingsView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		A1000058241B0A0000000001 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A1000032241B0A0000000001 /* Assets.xcassets */,
+				A1000038241B0A0000000001 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1000060241B0A0000000001 /* WhisprMute */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1000061241B0A0000000001 /* Build configuration list for PBXNativeTarget "WhisprMute" */;
+			buildPhases = (
+				A1000062241B0A0000000001 /* Sources */,
+				A1000040241B0A0000000001 /* Frameworks */,
+				A1000063241B0A0000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WhisprMute;
+			productName = WhisprMute;
+			productReference = A1000000241B0A0000000000 /* WhisprMute.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1000070241B0A0000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A1000060241B0A0000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A1000071241B0A0000000001 /* Build configuration list for PBXProject "WhisprMute" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A1000050241B0A0000000001;
+			productRefGroup = A1000053241B0A0000000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1000060241B0A0000000001 /* WhisprMute */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1000063241B0A0000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000031241B0A0000000001 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1000062241B0A0000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000001241B0A0000000001 /* WhisprMuteApp.swift in Sources */,
+				A1000003241B0A0000000001 /* AppDelegate.swift in Sources */,
+				A1000005241B0A0000000001 /* MicrophoneMonitor.swift in Sources */,
+				A1000007241B0A0000000001 /* WisprFlowDetector.swift in Sources */,
+				A1000009241B0A0000000001 /* MeetingAppController.swift in Sources */,
+				A1000011241B0A0000000001 /* MeetingApp.swift in Sources */,
+				A1000013241B0A0000000001 /* ZoomController.swift in Sources */,
+				A1000015241B0A0000000001 /* DiscordController.swift in Sources */,
+				A1000017241B0A0000000001 /* SlackController.swift in Sources */,
+				A1000019241B0A0000000001 /* TeamsController.swift in Sources */,
+				A1000021241B0A0000000001 /* GoogleMeetController.swift in Sources */,
+				A1000023241B0A0000000001 /* WebexController.swift in Sources */,
+				A1000025241B0A0000000001 /* SkypeController.swift in Sources */,
+				A1000027241B0A0000000001 /* MenuBarView.swift in Sources */,
+				A1000029241B0A0000000001 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A1000080241B0A0000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A1000081241B0A0000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A1000082241B0A0000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WhisprMute/Resources/WhisprMute.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WhisprMute/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.whisprmute.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A1000083241B0A0000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WhisprMute/Resources/WhisprMute.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WhisprMute/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.whisprmute.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1000061241B0A0000000001 /* Build configuration list for PBXNativeTarget "WhisprMute" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000082241B0A0000000001 /* Debug */,
+				A1000083241B0A0000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1000071241B0A0000000001 /* Build configuration list for PBXProject "WhisprMute" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000080241B0A0000000001 /* Debug */,
+				A1000081241B0A0000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1000070241B0A0000000001 /* Project object */;
+}
