@@ -7,6 +7,10 @@ class AudioLogMonitor {
 
     var onRecordingStateChanged: ((Bool) -> Void)?
 
+    var isCurrentlyRecording: Bool {
+        return lastRecordingState
+    }
+
     func startMonitoring() {
         // Use log stream for real-time detection instead of polling
         startLogStream()

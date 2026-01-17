@@ -26,7 +26,7 @@ class WisprFlowDetector {
     }
 
     func isWisprFlowRecording() -> Bool {
-        return audioLogMonitor.isWisprFlowCurrentlyRecording()
+        return audioLogMonitor.isCurrentlyRecording
     }
 
     func isWisprFlowRunning() -> Bool {
