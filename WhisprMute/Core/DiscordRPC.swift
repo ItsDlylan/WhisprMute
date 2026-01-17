@@ -149,7 +149,37 @@ class DiscordRPC {
             Darwin.send(socket, ptr.baseAddress!, frame.count, 0)
         }
 
+        if sent == frame.count {
+            // Read response
+            if let response = readFrame() {
+                print("[DiscordRPC] Response: \(response)")
+            }
+        }
+
         return sent == frame.count
+    }
+
+    private func readFrame() -> String? {
+        guard socket != -1 else { return nil }
+
+        // Read header (8 bytes: 4 for opcode, 4 for length)
+        var header = [UInt8](repeating: 0, count: 8)
+        let headerRead = Darwin.recv(socket, &header, 8, 0)
+
+        guard headerRead == 8 else { return nil }
+
+        // Parse length (little endian, bytes 4-7)
+        let length = UInt32(header[4]) | (UInt32(header[5]) << 8) | (UInt32(header[6]) << 16) | (UInt32(header[7]) << 24)
+
+        guard length > 0 && length < 65536 else { return nil }
+
+        // Read payload
+        var payload = [UInt8](repeating: 0, count: Int(length))
+        let payloadRead = Darwin.recv(socket, &payload, Int(length), 0)
+
+        guard payloadRead == Int(length) else { return nil }
+
+        return String(bytes: payload, encoding: .utf8)
     }
 
     private func sendCommand(_ cmd: String, args: [String: Any], nonce: String = UUID().uuidString) -> Bool {
