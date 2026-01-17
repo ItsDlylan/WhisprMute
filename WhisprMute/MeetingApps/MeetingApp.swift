@@ -72,6 +72,9 @@ extension MeetingAppControllable {
         guard let appleScript = NSAppleScript(source: script) else { return false }
         var error: NSDictionary?
         appleScript.executeAndReturnError(&error)
+        if let error = error {
+            print("[AppleScript Error] \(error)")
+        }
         return error == nil
     }
 
