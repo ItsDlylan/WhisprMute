@@ -186,7 +186,8 @@ class DiscordRPC {
 
         let args: [String: Any] = [
             "client_id": clientId,
-            "scopes": ["rpc", "rpc.voice.read", "rpc.voice.write"]
+            "scopes": ["rpc", "rpc.voice.read", "rpc.voice.write"],
+            "redirect_uri": "http://localhost"
         ]
 
         if sendCommand("AUTHORIZE", args: args) {
@@ -223,7 +224,7 @@ class DiscordRPC {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-        let body = "client_id=\(clientId)&client_secret=\(clientSecret)&grant_type=authorization_code&code=\(code)"
+        let body = "client_id=\(clientId)&client_secret=\(clientSecret)&grant_type=authorization_code&code=\(code)&redirect_uri=http://localhost"
         request.httpBody = body.data(using: .utf8)
 
         var accessToken: String?
