@@ -24,6 +24,7 @@ class AudioLogMonitor {
         let isRecording = isWisprFlowCurrentlyRecording()
 
         if isRecording != lastRecordingState {
+            print("[AudioLogMonitor] State changed: \(lastRecordingState) -> \(isRecording)")
             lastRecordingState = isRecording
             DispatchQueue.main.async {
                 self.onRecordingStateChanged?(isRecording)
@@ -57,9 +58,16 @@ class AudioLogMonitor {
                 return lastRecordingState && isWisprFlowRunning()
             }
 
+            // Check if we got any actual log entries (not just the header)
+            let lines = output.components(separatedBy: "\n").filter { !$0.isEmpty && !$0.hasPrefix("Timestamp") }
+            if lines.isEmpty {
+                return lastRecordingState && isWisprFlowRunning()
+            }
+
             // Parse for the LAST recording state
             // Look for patterns like "Recording = YES" or "Recording = NO"
-            return parseLastRecordingState(from: output)
+            let result = parseLastRecordingState(from: output)
+            return result
         } catch {
             return false
         }

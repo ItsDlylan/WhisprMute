@@ -53,14 +53,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func handleWisprFlowStateChange(isActive: Bool) {
+        print("[AppDelegate] Wispr Flow state changed: \(isActive)")
         appState.isWisprFlowActive = isActive
         updateMenuBarIcon()
 
-        guard appState.isEnabled else { return }
+        guard appState.isEnabled else {
+            print("[AppDelegate] App is disabled, not muting")
+            return
+        }
 
         if isActive {
+            print("[AppDelegate] Muting all meeting apps...")
             meetingAppController.muteAllMeetingApps()
         } else {
+            print("[AppDelegate] Restoring mute states...")
             meetingAppController.restoreMuteStates()
         }
     }

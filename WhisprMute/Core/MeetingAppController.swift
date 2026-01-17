@@ -31,19 +31,30 @@ class MeetingAppController {
 
     func muteAllMeetingApps() {
         let runningApps = detectRunningMeetingApps()
+        print("[MeetingAppController] Running apps: \(runningApps.map { $0.rawValue })")
         appsWeMuted.removeAll()
 
         for appType in runningApps {
-            guard appState.enabledApps.contains(appType.rawValue),
-                  let controller = controllers[appType] else { continue }
+            guard appState.enabledApps.contains(appType.rawValue) else {
+                print("[MeetingAppController] \(appType.rawValue) not in enabledApps, skipping")
+                continue
+            }
+            guard let controller = controllers[appType] else {
+                print("[MeetingAppController] No controller for \(appType.rawValue)")
+                continue
+            }
 
             // Store current mute state if we can detect it
             let currentMuteState = controller.isMuted()
             previousMuteStates[appType] = currentMuteState
+            print("[MeetingAppController] \(appType.rawValue) current mute state: \(String(describing: currentMuteState))")
 
             // Only mute if the app is currently unmuted (or we can't tell)
             if currentMuteState == false || currentMuteState == nil {
-                if controller.mute() {
+                print("[MeetingAppController] Attempting to mute \(appType.rawValue)...")
+                let success = controller.mute()
+                print("[MeetingAppController] Mute \(appType.rawValue): \(success ? "success" : "failed")")
+                if success {
                     appsWeMuted.insert(appType)
                     DispatchQueue.main.async {
                         self.appState.mutedApps.insert(appType.rawValue)
