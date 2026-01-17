@@ -186,8 +186,7 @@ class DiscordRPC {
 
         let args: [String: Any] = [
             "client_id": clientId,
-            "scopes": ["rpc", "rpc.voice.read", "rpc.voice.write"],
-            "redirect_uri": "http://localhost"
+            "scopes": ["rpc", "rpc.voice.read", "rpc.voice.write"]
         ]
 
         if sendCommand("AUTHORIZE", args: args) {
