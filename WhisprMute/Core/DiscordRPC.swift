@@ -32,6 +32,7 @@ class DiscordRPC {
     }
 
     init() {
+        print("[DiscordRPC] Client ID: \(clientId ?? "NOT SET")")
         connect()
     }
 
@@ -43,9 +44,11 @@ class DiscordRPC {
         // Discord IPC socket is at /var/folders/.../T/discord-ipc-{0-9}
         // We need to find the temp directory and try each pipe
         let tempDir = NSTemporaryDirectory()
+        print("[DiscordRPC] Looking for IPC socket in: \(tempDir)")
 
         for i in 0..<10 {
             let pipePath = (tempDir as NSString).appendingPathComponent("discord-ipc-\(i)")
+            print("[DiscordRPC] Trying: \(pipePath)")
 
             socket = Darwin.socket(AF_UNIX, SOCK_STREAM, 0)
             if socket == -1 {
@@ -65,6 +68,13 @@ class DiscordRPC {
                 }
             }
 
+            // Check if socket file exists
+            if !FileManager.default.fileExists(atPath: pipePath) {
+                Darwin.close(socket)
+                socket = -1
+                continue
+            }
+
             let connectResult = withUnsafePointer(to: &addr) { ptr in
                 ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockaddrPtr in
                     Darwin.connect(socket, sockaddrPtr, socklen_t(MemoryLayout<sockaddr_un>.size))
@@ -75,11 +85,14 @@ class DiscordRPC {
                 print("[DiscordRPC] Connected to discord-ipc-\(i)")
                 isConnected = true
 
-                // Send handshake - we need a client ID for this
-                // For now, we'll try without full OAuth
                 if sendHandshake() {
+                    print("[DiscordRPC] Handshake successful")
                     return true
+                } else {
+                    print("[DiscordRPC] Handshake failed")
                 }
+            } else {
+                print("[DiscordRPC] Connect failed for ipc-\(i): \(errno)")
             }
 
             Darwin.close(socket)
