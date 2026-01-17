@@ -12,12 +12,17 @@ class DiscordController: MeetingAppControllable {
 
     func mute() -> Bool {
         // Discord uses Cmd+Shift+M for mute toggle when in a voice channel
-        // Send keystroke directly to Discord without stealing focus
-        return sendKeyboardShortcut(
-            keyCode: 0x2E, // 'M' key
-            modifiers: [.maskCommand, .maskShift],
-            to: appType.bundleIdentifier
-        )
+        // Use System Events AppleScript for more reliable keystroke delivery
+        let script = """
+        tell application "System Events"
+            tell process "Discord"
+                keystroke "m" using {command down, shift down}
+            end tell
+        end tell
+        """
+        let success = runAppleScript(script)
+        print("[DiscordController] mute() via AppleScript: \(success)")
+        return success
     }
 
     func unmute() -> Bool {
