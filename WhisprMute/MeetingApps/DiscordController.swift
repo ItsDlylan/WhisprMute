@@ -11,7 +11,6 @@ class DiscordController: MeetingAppControllable {
 
     func mute() -> Bool {
         // Discord uses Cmd+Shift+M for mute toggle when in a voice channel
-        // We need to briefly activate Discord to send the keystroke reliably
 
         guard let discordApp = NSWorkspace.shared.runningApplications.first(where: {
             $0.bundleIdentifier == appType.bundleIdentifier
@@ -22,32 +21,46 @@ class DiscordController: MeetingAppControllable {
 
         // Remember the current frontmost app
         let previousApp = NSWorkspace.shared.frontmostApplication
+        print("[DiscordController] Previous app: \(previousApp?.localizedName ?? "none")")
 
-        // Activate Discord
-        discordApp.activate(options: [])
+        // Activate Discord and wait for it to be frontmost
+        discordApp.activate(options: .activateIgnoringOtherApps)
 
-        // Small delay to ensure Discord is active
-        usleep(100_000) // 100ms
+        // Wait for Discord to actually become active
+        var attempts = 0
+        while NSWorkspace.shared.frontmostApplication?.bundleIdentifier != appType.bundleIdentifier && attempts < 20 {
+            Thread.sleep(forTimeInterval: 0.05)
+            attempts += 1
+        }
+        print("[DiscordController] Discord activated after \(attempts) attempts")
 
         // Send Cmd+Shift+M keystroke
-        let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0x2E, keyDown: true) // M key
-        let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0x2E, keyDown: false)
+        let source = CGEventSource(stateID: .hidSystemState)
 
-        keyDown?.flags = [.maskCommand, .maskShift]
-        keyUp?.flags = [.maskCommand, .maskShift]
+        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x2E, keyDown: true),
+              let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x2E, keyDown: false) else {
+            print("[DiscordController] Failed to create CGEvents")
+            return false
+        }
 
-        keyDown?.post(tap: .cghidEventTap)
-        keyUp?.post(tap: .cghidEventTap)
+        keyDown.flags = [.maskCommand, .maskShift]
+        keyUp.flags = [.maskCommand, .maskShift]
 
-        // Small delay before switching back
-        usleep(50_000) // 50ms
+        keyDown.post(tap: .cghidEventTap)
+        Thread.sleep(forTimeInterval: 0.05)
+        keyUp.post(tap: .cghidEventTap)
+
+        print("[DiscordController] Keystroke sent")
+
+        // Wait a moment for the keystroke to be processed
+        Thread.sleep(forTimeInterval: 0.1)
 
         // Restore previous app
         if let previousApp = previousApp, previousApp.bundleIdentifier != appType.bundleIdentifier {
-            previousApp.activate(options: [])
+            print("[DiscordController] Restoring: \(previousApp.localizedName ?? "unknown")")
+            previousApp.activate(options: .activateIgnoringOtherApps)
         }
 
-        print("[DiscordController] mute() sent keystroke to Discord")
         return true
     }
 
