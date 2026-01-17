@@ -12,6 +12,7 @@
 		A1000005241B0A0000000001 /* AudioLogMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006241B0A0000000001 /* AudioLogMonitor.swift */; };
 		A1000007241B0A0000000001 /* WisprFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008241B0A0000000001 /* WisprFlowDetector.swift */; };
 		A1000009241B0A0000000001 /* MeetingAppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000010241B0A0000000001 /* MeetingAppController.swift */; };
+		A1000037241B0A0000000001 /* DiscordRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000039241B0A0000000001 /* DiscordRPC.swift */; };
 		A1000011241B0A0000000001 /* MeetingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000012241B0A0000000001 /* MeetingApp.swift */; };
 		A1000013241B0A0000000001 /* ZoomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000014241B0A0000000001 /* ZoomController.swift */; };
 		A1000015241B0A0000000001 /* DiscordController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000016241B0A0000000001 /* DiscordController.swift */; };
@@ -48,6 +49,7 @@
 		A1000034241B0A0000000001 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A1000036241B0A0000000001 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A1000038241B0A0000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1000039241B0A0000000001 /* DiscordRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscordRPC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +118,7 @@
 				A1000006241B0A0000000001 /* AudioLogMonitor.swift */,
 				A1000008241B0A0000000001 /* WisprFlowDetector.swift */,
 				A1000010241B0A0000000001 /* MeetingAppController.swift */,
+				A1000039241B0A0000000001 /* DiscordRPC.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -227,6 +230,7 @@
 				A1000005241B0A0000000001 /* AudioLogMonitor.swift in Sources */,
 				A1000007241B0A0000000001 /* WisprFlowDetector.swift in Sources */,
 				A1000009241B0A0000000001 /* MeetingAppController.swift in Sources */,
+				A1000037241B0A0000000001 /* DiscordRPC.swift in Sources */,
 				A1000011241B0A0000000001 /* MeetingApp.swift in Sources */,
 				A1000013241B0A0000000001 /* ZoomController.swift in Sources */,
 				A1000015241B0A0000000001 /* DiscordController.swift in Sources */,
