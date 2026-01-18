@@ -81,20 +81,24 @@ class GoogleMeetController: MeetingAppControllable {
     private func muteInChrome() -> Bool {
         let script = """
         tell application "Google Chrome"
-            set meetTab to missing value
+            set meetWindow to missing value
+            set meetTabIndex to 0
             repeat with w in windows
+                set tabIndex to 0
                 repeat with t in tabs of w
+                    set tabIndex to tabIndex + 1
                     if URL of t contains "meet.google.com" then
-                        set meetTab to t
-                        set active tab index of w to index of t
-                        set index of w to 1
+                        set meetWindow to w
+                        set meetTabIndex to tabIndex
                         exit repeat
                     end if
                 end repeat
-                if meetTab is not missing value then exit repeat
+                if meetWindow is not missing value then exit repeat
             end repeat
 
-            if meetTab is not missing value then
+            if meetWindow is not missing value then
+                set active tab index of meetWindow to meetTabIndex
+                set index of meetWindow to 1
                 activate
                 tell application "System Events"
                     keystroke "d" using {command down}
@@ -111,20 +115,22 @@ class GoogleMeetController: MeetingAppControllable {
     private func muteInSafari() -> Bool {
         let script = """
         tell application "Safari"
+            set meetWindow to missing value
             set meetTab to missing value
             repeat with w in windows
                 repeat with t in tabs of w
                     if URL of t contains "meet.google.com" then
+                        set meetWindow to w
                         set meetTab to t
-                        set current tab of w to t
-                        set index of w to 1
                         exit repeat
                     end if
                 end repeat
-                if meetTab is not missing value then exit repeat
+                if meetWindow is not missing value then exit repeat
             end repeat
 
-            if meetTab is not missing value then
+            if meetWindow is not missing value then
+                set current tab of meetWindow to meetTab
+                set index of meetWindow to 1
                 activate
                 tell application "System Events"
                     keystroke "d" using {command down}
