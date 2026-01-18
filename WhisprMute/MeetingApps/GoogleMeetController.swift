@@ -13,11 +13,15 @@ class GoogleMeetController: MeetingAppControllable {
     ]
 
     func isRunning() -> Bool {
-        // Check if any browser has a Meet tab (approximation - check if browser is running)
+        // If CDP is available, check if there's actually a Meet tab open
+        if cdpClient.isDebugPortAvailable() {
+            return cdpClient.findMeetTab() != nil
+        }
+
+        // Fallback: just check if Chrome is running (can't detect Meet tab without CDP)
         let runningApps = NSWorkspace.shared.runningApplications
         return runningApps.contains { app in
-            guard let bundleId = app.bundleIdentifier else { return false }
-            return browserBundleIds.contains(bundleId)
+            app.bundleIdentifier == "com.google.Chrome"
         }
     }
 

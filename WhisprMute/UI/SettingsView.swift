@@ -32,13 +32,19 @@ struct SettingsView: View {
         }
         .frame(width: 450, height: 380)
         .onAppear {
-            refreshChromeStatus()
             loadProfiles()
+            refreshChromeStatus()  // Now async, won't block
         }
     }
 
     private func refreshChromeStatus() {
-        chromeDebugStatus = ChromeDebugHelper.shared.getStatus()
+        // Run on background thread to avoid blocking UI with network call
+        DispatchQueue.global(qos: .userInitiated).async {
+            let status = ChromeDebugHelper.shared.getStatus()
+            DispatchQueue.main.async {
+                chromeDebugStatus = status
+            }
+        }
     }
 
     private func loadProfiles() {
@@ -156,7 +162,7 @@ struct SettingsView: View {
             } header: {
                 Text("Google Meet Setup")
             } footer: {
-                Text("WhisprMute clones your selected Chrome profile to enable debug mode. Your bookmarks and extensions will be copied. You may need to sign into Google Meet once.")
+                Text("Creates a separate Chrome profile for debug mode. Your settings, bookmarks, passwords, history, and login sessions will be copied. Extensions are not copied.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -167,23 +173,36 @@ struct SettingsView: View {
 
     private func setupChromeDebugMode() {
         isRestartingChrome = true
+        let isFirstTimeSetup = !ChromeDebugHelper.shared.hasClonedProfile()
 
-        // Clone the selected profile first
-        DispatchQueue.global(qos: .userInitiated).async {
-            let cloneSuccess = ChromeDebugHelper.shared.cloneProfile(profileId: selectedProfileId)
+        // Request media permissions first if this is first-time setup
+        let proceedWithSetup = {
+            // Clone the selected profile
+            DispatchQueue.global(qos: .userInitiated).async {
+                let cloneSuccess = ChromeDebugHelper.shared.cloneProfile(profileId: self.selectedProfileId)
 
-            DispatchQueue.main.async {
-                if cloneSuccess {
-                    // Now restart Chrome with debug mode
-                    ChromeDebugHelper.shared.restartChromeWithDebugMode { success in
-                        isRestartingChrome = false
-                        refreshChromeStatus()
+                DispatchQueue.main.async {
+                    if cloneSuccess {
+                        // Now restart Chrome with debug mode
+                        ChromeDebugHelper.shared.restartChromeWithDebugMode { success in
+                            self.isRestartingChrome = false
+                            self.refreshChromeStatus()
+                        }
+                    } else {
+                        self.isRestartingChrome = false
+                        print("[SettingsView] Failed to clone profile")
                     }
-                } else {
-                    isRestartingChrome = false
-                    print("[SettingsView] Failed to clone profile")
                 }
             }
+        }
+
+        if isFirstTimeSetup {
+            // Request camera/mic permissions before proceeding
+            ChromeDebugHelper.shared.requestMediaPermissions {
+                proceedWithSetup()
+            }
+        } else {
+            proceedWithSetup()
         }
     }
 

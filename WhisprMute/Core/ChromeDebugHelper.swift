@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import AVFoundation
 
 /// Represents a Chrome profile
 struct ChromeProfile: Identifiable, Hashable {
@@ -88,28 +89,30 @@ class ChromeDebugHelper {
             return false
         }
 
-        // Essential files/folders to copy
-        let essentialItems = [
+        // Copy essential profile data
+        // Note: Extensions and their state are skipped to avoid service worker failures
+        let itemsToCopy = [
             "Preferences",
-            "Secure Preferences",
             "Bookmarks",
             "Cookies",
-            "Login Data",
-            "Web Data",
-            "Extensions",
-            "Extension State",
-            "Local Extension Settings"
+            "Login Data",           // Saved passwords
+            "Web Data",             // Autofill data
+            "History",              // Browsing history
+            "Favicons",             // Site icons
+            "Top Sites",            // Frequently visited
+            "Shortcuts",            // Omnibox shortcuts
+            "Local Storage",        // Site localStorage (device preferences)
+            "IndexedDB",            // Site IndexedDB (app data like Meet settings)
+            "Session Storage"       // Session data
         ]
 
-        var copiedCount = 0
-        for item in essentialItems {
+        for item in itemsToCopy {
             let sourceItem = sourcePath + "/" + item
             let destItem = destPath + "/" + item
 
             if FileManager.default.fileExists(atPath: sourceItem) {
                 do {
                     try FileManager.default.copyItem(atPath: sourceItem, toPath: destItem)
-                    copiedCount += 1
                     print("[ChromeDebugHelper] Copied: \(item)")
                 } catch {
                     print("[ChromeDebugHelper] Failed to copy \(item): \(error)")
@@ -117,26 +120,42 @@ class ChromeDebugHelper {
             }
         }
 
-        // Also copy Local State to the base directory (needed for Chrome to recognize the profile)
-        let localStateSource = chromeUserDataPath + "/Local State"
-        let localStateDest = debugProfileBasePath + "/Local State"
-        if FileManager.default.fileExists(atPath: localStateSource) {
-            do {
-                try FileManager.default.copyItem(atPath: localStateSource, toPath: localStateDest)
-                print("[ChromeDebugHelper] Copied Local State")
-            } catch {
-                print("[ChromeDebugHelper] Failed to copy Local State: \(error)")
-            }
-        }
+        // Create First Run file to skip Chrome's first-run experience
+        let firstRunPath = debugProfileBasePath + "/First Run"
+        FileManager.default.createFile(atPath: firstRunPath, contents: nil)
 
-        print("[ChromeDebugHelper] Profile clone complete. Copied \(copiedCount) items.")
-        return copiedCount > 0
+        print("[ChromeDebugHelper] Debug profile created successfully")
+        return true
     }
 
     /// Check if a cloned debug profile exists
     func hasClonedProfile() -> Bool {
         let profilePath = debugProfileBasePath + "/Default"
         return FileManager.default.fileExists(atPath: profilePath)
+    }
+
+    /// Request camera and microphone permissions proactively
+    /// This prevents permission dialogs from appearing unexpectedly when Chrome uses them
+    func requestMediaPermissions(completion: @escaping () -> Void) {
+        let group = DispatchGroup()
+
+        // Request camera permission
+        group.enter()
+        AVCaptureDevice.requestAccess(for: .video) { granted in
+            print("[ChromeDebugHelper] Camera permission: \(granted ? "granted" : "denied")")
+            group.leave()
+        }
+
+        // Request microphone permission
+        group.enter()
+        AVCaptureDevice.requestAccess(for: .audio) { granted in
+            print("[ChromeDebugHelper] Microphone permission: \(granted ? "granted" : "denied")")
+            group.leave()
+        }
+
+        group.notify(queue: .main) {
+            completion()
+        }
     }
 
     // MARK: - Chrome Status

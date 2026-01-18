@@ -26,6 +26,8 @@
 	<string>NSApplication</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>WhisprMute needs to monitor microphone usage to detect when Wispr Flow is recording.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>WhisprMute launches Chrome with debug mode enabled, which requires camera access for Google Meet video calls.</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>WhisprMute needs to send commands to meeting apps to mute and unmute them.</string>
 </dict>
