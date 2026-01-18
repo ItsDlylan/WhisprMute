@@ -1,9 +1,9 @@
 import SwiftUI
+import AppKit
 
 struct MenuBarView: View {
     @ObservedObject var appState: AppState
     let quitAction: () -> Void
-    let openSettingsAction: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -139,18 +139,8 @@ struct MenuBarView: View {
 
     private var actionsSection: some View {
         VStack(spacing: 4) {
-            Button(action: openSettingsAction) {
-                HStack {
-                    Image(systemName: "gear")
-                    Text("Settings")
-                    Spacer()
-                    Text("\u{2318},")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            .buttonStyle(.plain)
-            .padding(.vertical, 4)
+            settingsButton
+                .padding(.vertical, 4)
 
             Button(action: quitAction) {
                 HStack {
@@ -165,6 +155,38 @@ struct MenuBarView: View {
             .buttonStyle(.plain)
             .padding(.vertical, 4)
         }
+    }
+
+    @ViewBuilder
+    private var settingsButton: some View {
+        if #available(macOS 14.0, *) {
+            SettingsLink {
+                settingsButtonContent
+            }
+            .buttonStyle(.plain)
+        } else {
+            Button(action: openSettingsLegacy) {
+                settingsButtonContent
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var settingsButtonContent: some View {
+        HStack {
+            Image(systemName: "gear")
+            Text("Settings")
+            Spacer()
+            Text("\u{2318},")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .contentShape(Rectangle())
+    }
+
+    private func openSettingsLegacy() {
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 }
 
@@ -217,7 +239,6 @@ struct MeetingAppRow: View {
             state.isWisprFlowActive = true
             return state
         }(),
-        quitAction: {},
-        openSettingsAction: {}
+        quitAction: {}
     )
 }

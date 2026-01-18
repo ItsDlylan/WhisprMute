@@ -3,6 +3,7 @@ import AppKit
 
 class GoogleMeetController: MeetingAppControllable {
     let appType: MeetingAppType = .googleMeet
+    private let cdpClient = CDPClient()
 
     private let browserBundleIds = [
         "com.google.Chrome",
@@ -21,18 +22,60 @@ class GoogleMeetController: MeetingAppControllable {
     }
 
     func isMuted() -> Bool? {
-        // Cannot reliably detect Meet mute state from outside the browser
+        // Try CDP first for accurate mute state detection
+        if cdpClient.isDebugPortAvailable() {
+            return cdpClient.isMeetMuted()
+        }
+        // Cannot reliably detect Meet mute state without CDP
         return nil
     }
 
     func mute() -> Bool {
-        // Google Meet uses Cmd+D for mute toggle
-        // Try Chrome first as it's most common
-        return muteInChrome() || muteInSafari() || muteInFirefox()
+        // Try CDP first (no focus stealing)
+        if cdpClient.isDebugPortAvailable() {
+            print("[GoogleMeetController] Using CDP to mute")
+            if cdpClient.muteMeet() {
+                return true
+            }
+        }
+
+        // Fallback to AppleScript with focus save/restore
+        print("[GoogleMeetController] CDP unavailable, falling back to AppleScript with focus restore")
+        return muteWithFocusRestore()
     }
 
     func unmute() -> Bool {
-        return mute() // Toggle
+        // Try CDP first (no focus stealing)
+        if cdpClient.isDebugPortAvailable() {
+            print("[GoogleMeetController] Using CDP to unmute")
+            if cdpClient.unmuteMeet() {
+                return true
+            }
+        }
+
+        // Fallback to AppleScript with focus save/restore
+        print("[GoogleMeetController] CDP unavailable, falling back to AppleScript with focus restore")
+        return muteWithFocusRestore() // Toggle
+    }
+
+    // MARK: - AppleScript Fallback with Focus Restore
+
+    private func muteWithFocusRestore() -> Bool {
+        // Save the current frontmost application
+        let frontmostApp = NSWorkspace.shared.frontmostApplication
+
+        // Try Chrome first as it's most common
+        let success = muteInChrome() || muteInSafari() || muteInFirefox()
+
+        // Restore focus to the original app
+        if let app = frontmostApp {
+            // Small delay to ensure the mute command completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                app.activate()
+            }
+        }
+
+        return success
     }
 
     private func muteInChrome() -> Bool {

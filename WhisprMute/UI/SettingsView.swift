@@ -3,6 +3,8 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
     @State private var showingPermissionsAlert = false
+    @State private var chromeDebugStatus: ChromeDebugHelper.ChromeDebugStatus = .chromeNotRunning
+    @State private var isRestartingChrome = false
 
     var body: some View {
         TabView {
@@ -26,7 +28,14 @@ struct SettingsView: View {
                     Label("About", systemImage: "info.circle")
                 }
         }
-        .frame(width: 450, height: 350)
+        .frame(width: 450, height: 380)
+        .onAppear {
+            refreshChromeStatus()
+        }
+    }
+
+    private func refreshChromeStatus() {
+        chromeDebugStatus = ChromeDebugHelper.shared.getStatus()
     }
 
     private var generalTab: some View {
@@ -112,9 +121,32 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+
+            Section {
+                ChromeDebugRow(
+                    status: chromeDebugStatus,
+                    isRestarting: isRestartingChrome,
+                    onRestart: restartChromeWithDebugMode,
+                    onRefresh: refreshChromeStatus
+                )
+            } header: {
+                Text("Google Meet Setup")
+            } footer: {
+                Text("Google Meet requires Chrome to run with debug mode for focus-free muting. This allows WhisprMute to mute Meet without stealing focus from your current app.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
         .formStyle(.grouped)
         .padding()
+    }
+
+    private func restartChromeWithDebugMode() {
+        isRestartingChrome = true
+        ChromeDebugHelper.shared.restartChromeWithDebugMode { success in
+            isRestartingChrome = false
+            refreshChromeStatus()
+        }
     }
 
     private var aboutTab: some View {
@@ -198,6 +230,89 @@ struct PermissionRow: View {
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
+        }
+    }
+}
+
+struct ChromeDebugRow: View {
+    let status: ChromeDebugHelper.ChromeDebugStatus
+    let isRestarting: Bool
+    let onRestart: () -> Void
+    let onRefresh: () -> Void
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("Chrome Debug Mode")
+                        .fontWeight(.medium)
+
+                    statusIcon
+                }
+
+                Text(statusDescription)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            if isRestarting {
+                ProgressView()
+                    .scaleEffect(0.7)
+                    .frame(width: 60)
+            } else {
+                HStack(spacing: 8) {
+                    Button(action: onRefresh) {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Refresh status")
+
+                    if status == .debugModeDisabled {
+                        Button("Restart Chrome") {
+                            onRestart()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    } else if status == .chromeNotRunning {
+                        Button("Launch Chrome") {
+                            onRestart()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var statusIcon: some View {
+        switch status {
+        case .debugModeEnabled:
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.green)
+                .font(.caption)
+        case .debugModeDisabled:
+            Image(systemName: "exclamationmark.circle.fill")
+                .foregroundColor(.orange)
+                .font(.caption)
+        case .chromeNotRunning:
+            Image(systemName: "minus.circle.fill")
+                .foregroundColor(.secondary)
+                .font(.caption)
+        }
+    }
+
+    private var statusDescription: String {
+        switch status {
+        case .debugModeEnabled:
+            return "Chrome is ready for Google Meet integration"
+        case .debugModeDisabled:
+            return "Chrome needs to be restarted with debug mode"
+        case .chromeNotRunning:
+            return "Launch Chrome with debug mode to enable Google Meet"
         }
     }
 }

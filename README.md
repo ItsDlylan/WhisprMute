@@ -20,7 +20,7 @@ No manual muting. No embarrassing moments. Just seamless dictation while in meet
 | App | Status | Mute Method |
 |-----|--------|-------------|
 | Discord | **Fully Supported** | Discord RPC API (native integration) |
-| Google Meet | In Development | Coming soon |
+| Google Meet | **Fully Supported** | Chrome DevTools Protocol (no focus stealing) |
 | Zoom | In Development | Coming soon |
 | Slack | Planned | - |
 | Microsoft Teams | Planned | - |
@@ -65,6 +65,33 @@ WhisprMute uses Discord's RPC API for native mute control. You'll need to set up
    ```
 6. On first run, Discord will prompt you to authorize WhisprMute
 
+### Google Meet Setup
+
+Google Meet runs in Chrome and requires Chrome's DevTools Protocol for focus-free muting. This allows WhisprMute to mute Meet without stealing focus from your current app (critical for Wispr Flow to maintain input context).
+
+**Option 1: Use WhisprMute Settings (Recommended)**
+
+1. Open WhisprMute Settings > Permissions tab
+2. Look for "Google Meet Setup" section
+3. Click "Restart Chrome" (or "Launch Chrome" if not running)
+4. WhisprMute will restart Chrome with debug mode enabled and restore your tabs
+
+**Option 2: Manual Setup**
+
+Launch Chrome with the remote debugging flag:
+
+```bash
+open -a "Google Chrome" --args --remote-debugging-port=9222
+```
+
+Or create an alias in your shell profile (`~/.zshrc` or `~/.bashrc`):
+
+```bash
+alias chrome='open -a "Google Chrome" --args --remote-debugging-port=9222'
+```
+
+**Note:** Chrome must be launched with this flag each time for Google Meet muting to work without focus stealing. If Chrome is running without debug mode, WhisprMute will fall back to AppleScript (which briefly steals focus but restores it automatically).
+
 ### Required Permissions
 
 WhisprMute needs **Accessibility** permissions to function:
@@ -87,7 +114,9 @@ Your teammates never hear your dictation. You stay productive.
 
 2. **Discord RPC Integration**: Connects to Discord's local IPC socket and uses the RPC API with OAuth2 authentication to control mute state - no keyboard shortcuts or focus stealing
 
-3. **Smart State Management**: Remembers which apps were already muted before Wispr Flow started, and only unmutes apps that were previously unmuted
+3. **Google Meet via Chrome DevTools Protocol**: Connects to Chrome's debug port (localhost:9222), finds the Meet tab via WebSocket, and injects JavaScript to click the mute button - no focus stealing required
+
+4. **Smart State Management**: Remembers which apps were already muted before Wispr Flow started, and only unmutes apps that were previously unmuted
 
 ## Architecture
 
@@ -100,10 +129,13 @@ WhisprMute/
 │   ├── AudioLogMonitor.swift     # Real-time log stream monitoring
 │   ├── WisprFlowDetector.swift   # Wispr Flow activity detection
 │   ├── MeetingAppController.swift # Mute/unmute orchestration
-│   └── DiscordRPC.swift          # Discord RPC client with OAuth2
+│   ├── DiscordRPC.swift          # Discord RPC client with OAuth2
+│   ├── CDPClient.swift           # Chrome DevTools Protocol client
+│   └── ChromeDebugHelper.swift   # Chrome debug mode management
 ├── MeetingApps/
 │   ├── MeetingApp.swift          # Protocol & base implementation
 │   ├── DiscordController.swift   # Discord via RPC API
+│   ├── GoogleMeetController.swift # Google Meet via CDP
 │   └── ...                       # Other app controllers
 └── UI/
     ├── MenuBarView.swift         # Menu bar icon and menu
@@ -119,6 +151,14 @@ WhisprMute/
 3. Delete `~/.whisprmute_token` to force re-authorization
 4. Make sure you're in a voice channel when testing
 
+### Google Meet not muting
+
+1. **Check Chrome debug mode**: Open WhisprMute Settings > Permissions and check if "Chrome Debug Mode" shows a green checkmark
+2. **Restart Chrome with debug mode**: Click "Restart Chrome" in the Settings > Permissions tab
+3. **Verify manually**: Open `http://localhost:9222/json` in your browser - you should see JSON listing your tabs
+4. **Check the Meet tab**: Make sure you're in an active Google Meet call (not just on the Meet homepage)
+5. **Fallback mode**: If Chrome isn't in debug mode, WhisprMute will use AppleScript which briefly steals focus - this is expected behavior
+
 ### Wispr Flow not detected
 
 1. Make sure Wispr Flow is running
@@ -131,8 +171,9 @@ MIT License - see LICENSE file for details.
 ## Contributing
 
 Contributions are welcome! We're especially looking for help with:
-- Google Meet integration (browser-based, needs creative solution)
 - Zoom integration
+- Slack Huddles integration
+- Microsoft Teams integration
 - Other meeting app support
 
 Please feel free to submit a Pull Request.

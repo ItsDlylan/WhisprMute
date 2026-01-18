@@ -12,7 +12,6 @@
 		A1000005241B0A0000000001 /* AudioLogMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006241B0A0000000001 /* AudioLogMonitor.swift */; };
 		A1000007241B0A0000000001 /* WisprFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008241B0A0000000001 /* WisprFlowDetector.swift */; };
 		A1000009241B0A0000000001 /* MeetingAppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000010241B0A0000000001 /* MeetingAppController.swift */; };
-		A1000037241B0A0000000001 /* DiscordRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000039241B0A0000000001 /* DiscordRPC.swift */; };
 		A1000011241B0A0000000001 /* MeetingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000012241B0A0000000001 /* MeetingApp.swift */; };
 		A1000013241B0A0000000001 /* ZoomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000014241B0A0000000001 /* ZoomController.swift */; };
 		A1000015241B0A0000000001 /* DiscordController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000016241B0A0000000001 /* DiscordController.swift */; };
@@ -26,6 +25,9 @@
 		A1000031241B0A0000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000032241B0A0000000001 /* Assets.xcassets */; };
 		A1000033241B0A0000000001 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000034241B0A0000000001 /* CoreAudio.framework */; };
 		A1000035241B0A0000000001 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000036241B0A0000000001 /* AVFoundation.framework */; };
+		A1000037241B0A0000000001 /* DiscordRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000039241B0A0000000001 /* DiscordRPC.swift */; };
+		F306E39F2F1CB566007968AA /* CDPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F306E39D2F1CB566007968AA /* CDPClient.swift */; };
+		F306E3A02F1CB566007968AA /* ChromeDebugHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F306E39E2F1CB566007968AA /* ChromeDebugHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +52,8 @@
 		A1000036241B0A0000000001 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A1000038241B0A0000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1000039241B0A0000000001 /* DiscordRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscordRPC.swift; sourceTree = "<group>"; };
+		F306E39D2F1CB566007968AA /* CDPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CDPClient.swift; sourceTree = "<group>"; };
+		F306E39E2F1CB566007968AA /* ChromeDebugHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeDebugHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +119,8 @@
 		A1000055241B0A0000000001 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				F306E39D2F1CB566007968AA /* CDPClient.swift */,
+				F306E39E2F1CB566007968AA /* ChromeDebugHelper.swift */,
 				A1000006241B0A0000000001 /* AudioLogMonitor.swift */,
 				A1000008241B0A0000000001 /* WisprFlowDetector.swift */,
 				A1000010241B0A0000000001 /* MeetingAppController.swift */,
@@ -226,6 +232,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001241B0A0000000001 /* WhisprMuteApp.swift in Sources */,
+				F306E39F2F1CB566007968AA /* CDPClient.swift in Sources */,
+				F306E3A02F1CB566007968AA /* ChromeDebugHelper.swift in Sources */,
 				A1000003241B0A0000000001 /* AppDelegate.swift in Sources */,
 				A1000005241B0A0000000001 /* AudioLogMonitor.swift in Sources */,
 				A1000007241B0A0000000001 /* WisprFlowDetector.swift in Sources */,

@@ -29,8 +29,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: MenuBarView(appState: appState, quitAction: {
             NSApplication.shared.terminate(nil)
-        }, openSettingsAction: {
-            self.openSettings()
         }))
     }
 
@@ -105,12 +103,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 popover.contentViewController?.view.window?.makeKey()
             }
         }
-    }
-
-    private func openSettings() {
-        popover.performClose(nil)
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        NSApp.activate(ignoringOtherApps: true)
     }
 
     func applicationWillTerminate(_ notification: Notification) {
