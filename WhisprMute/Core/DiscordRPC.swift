@@ -352,4 +352,31 @@ class DiscordRPC {
         }
         return false
     }
+
+    /// Get current mute state from Discord
+    func getMuteState() -> Bool? {
+        if !isConnected {
+            print("[DiscordRPC] Not connected, attempting to connect...")
+            if !connect() { return nil }
+        }
+
+        if !isAuthenticated {
+            print("[DiscordRPC] Not authenticated")
+            return nil
+        }
+
+        if sendCommand("GET_VOICE_SETTINGS", args: [:]) {
+            if let response = readFrame() {
+                print("[DiscordRPC] getMuteState response: \(response.prefix(200))...")
+
+                if let data = response.data(using: .utf8),
+                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let dataObj = json["data"] as? [String: Any],
+                   let muted = dataObj["mute"] as? Bool {
+                    return muted
+                }
+            }
+        }
+        return nil
+    }
 }

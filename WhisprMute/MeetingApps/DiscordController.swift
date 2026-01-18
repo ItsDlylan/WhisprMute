@@ -5,19 +5,22 @@ class DiscordController: MeetingAppControllable {
     let appType: MeetingAppType = .discord
     private var discordRPC: DiscordRPC?
 
-    func isMuted() -> Bool? {
-        return nil
-    }
-
-    func mute() -> Bool {
-        // Use Discord RPC to mute - no app switching needed
+    private func ensureRPC() -> DiscordRPC? {
         if discordRPC == nil {
             discordRPC = DiscordRPC()
         }
-        return discordRPC?.setMute(true) ?? false
+        return discordRPC
+    }
+
+    func isMuted() -> Bool? {
+        return ensureRPC()?.getMuteState()
+    }
+
+    func mute() -> Bool {
+        return ensureRPC()?.setMute(true) ?? false
     }
 
     func unmute() -> Bool {
-        return discordRPC?.setMute(false) ?? false
+        return ensureRPC()?.setMute(false) ?? false
     }
 }
