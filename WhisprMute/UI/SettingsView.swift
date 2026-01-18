@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
@@ -7,6 +8,11 @@ struct SettingsView: View {
     @State private var isRestartingChrome = false
     @State private var availableProfiles: [ChromeProfile] = []
     @AppStorage("selectedChromeProfileId") private var selectedProfileId: String = "Default"
+
+    // Permission states (refreshed periodically)
+    @State private var hasAccessibilityPermission = false
+    @State private var hasCameraPermission = false
+    @State private var hasMicrophonePermission = false
 
     var body: some View {
         TabView {
@@ -33,8 +39,18 @@ struct SettingsView: View {
         .frame(width: 450, height: 380)
         .onAppear {
             loadProfiles()
-            refreshChromeStatus()  // Now async, won't block
+            refreshChromeStatus()
+            refreshPermissions()
         }
+        .onReceive(Timer.publish(every: 2, on: .main, in: .common).autoconnect()) { _ in
+            refreshPermissions()
+        }
+    }
+
+    private func refreshPermissions() {
+        hasAccessibilityPermission = checkAccessibilityPermission()
+        hasCameraPermission = checkCameraPermission()
+        hasMicrophonePermission = checkMicrophonePermission()
     }
 
     private func refreshChromeStatus() {
@@ -125,7 +141,7 @@ struct SettingsView: View {
                 PermissionRow(
                     title: "Accessibility",
                     description: "Required to control mute buttons in other apps",
-                    isGranted: checkAccessibilityPermission(),
+                    isGranted: hasAccessibilityPermission,
                     action: openAccessibilitySettings
                 )
 
@@ -134,6 +150,20 @@ struct SettingsView: View {
                     description: "Required to send commands to meeting apps",
                     isGranted: true, // Can't easily check this
                     action: openAutomationSettings
+                )
+
+                PermissionRow(
+                    title: "Camera",
+                    description: "Required for Chrome debug mode (Google Meet)",
+                    isGranted: hasCameraPermission,
+                    action: openCameraSettings
+                )
+
+                PermissionRow(
+                    title: "Microphone",
+                    description: "Required for Chrome debug mode (Google Meet)",
+                    isGranted: hasMicrophonePermission,
+                    action: openMicrophoneSettings
                 )
             } header: {
                 Text("Required Permissions")
@@ -162,7 +192,7 @@ struct SettingsView: View {
             } header: {
                 Text("Google Meet Setup")
             } footer: {
-                Text("Creates a separate Chrome profile for debug mode. Your settings, bookmarks, passwords, history, and login sessions will be copied. Extensions are not copied.")
+                Text("Creates a separate Chrome profile for debug mode. Your settings, bookmarks, passwords, history, extensions, and login sessions will be copied.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -247,6 +277,24 @@ struct SettingsView: View {
 
     private func openAutomationSettings() {
         let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation")!
+        NSWorkspace.shared.open(url)
+    }
+
+    private func checkCameraPermission() -> Bool {
+        return AVCaptureDevice.authorizationStatus(for: .video) == .authorized
+    }
+
+    private func checkMicrophonePermission() -> Bool {
+        return AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
+    }
+
+    private func openCameraSettings() {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")!
+        NSWorkspace.shared.open(url)
+    }
+
+    private func openMicrophoneSettings() {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
         NSWorkspace.shared.open(url)
     }
 }

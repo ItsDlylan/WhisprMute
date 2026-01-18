@@ -93,6 +93,7 @@ class ChromeDebugHelper {
         // Note: Extension State and Local Extension Settings are skipped to avoid service worker failures
         let itemsToCopy = [
             "Preferences",
+            "Secure Preferences",   // Extension permissions and registration
             "Bookmarks",
             "Cookies",
             "Login Data",           // Saved passwords
