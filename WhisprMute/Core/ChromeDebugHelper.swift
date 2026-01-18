@@ -90,7 +90,7 @@ class ChromeDebugHelper {
         }
 
         // Copy essential profile data
-        // Note: Extensions and their state are skipped to avoid service worker failures
+        // Note: Extension State and Local Extension Settings are skipped to avoid service worker failures
         let itemsToCopy = [
             "Preferences",
             "Bookmarks",
@@ -103,7 +103,8 @@ class ChromeDebugHelper {
             "Shortcuts",            // Omnibox shortcuts
             "Local Storage",        // Site localStorage (device preferences)
             "IndexedDB",            // Site IndexedDB (app data like Meet settings)
-            "Session Storage"       // Session data
+            "Session Storage",      // Session data
+            "Extensions"            // Extension code (without state)
         ]
 
         for item in itemsToCopy {
