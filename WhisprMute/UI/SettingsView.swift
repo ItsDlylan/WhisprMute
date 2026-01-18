@@ -5,6 +5,8 @@ struct SettingsView: View {
     @State private var showingPermissionsAlert = false
     @State private var chromeDebugStatus: ChromeDebugHelper.ChromeDebugStatus = .chromeNotRunning
     @State private var isRestartingChrome = false
+    @State private var availableProfiles: [ChromeProfile] = []
+    @AppStorage("selectedChromeProfileId") private var selectedProfileId: String = "Default"
 
     var body: some View {
         TabView {
@@ -31,11 +33,24 @@ struct SettingsView: View {
         .frame(width: 450, height: 380)
         .onAppear {
             refreshChromeStatus()
+            loadProfiles()
         }
     }
 
     private func refreshChromeStatus() {
         chromeDebugStatus = ChromeDebugHelper.shared.getStatus()
+    }
+
+    private func loadProfiles() {
+        availableProfiles = ChromeDebugHelper.shared.getAvailableProfiles()
+        // Ensure selected profile exists in available profiles
+        if !availableProfiles.contains(where: { $0.id == selectedProfileId }) {
+            selectedProfileId = availableProfiles.first?.id ?? "Default"
+        }
+    }
+
+    private var selectedProfile: ChromeProfile {
+        availableProfiles.first(where: { $0.id == selectedProfileId }) ?? ChromeProfile(id: "Default", displayName: "Default")
     }
 
     private var generalTab: some View {
@@ -123,16 +138,25 @@ struct SettingsView: View {
             }
 
             Section {
+                // Profile picker
+                Picker("Chrome Profile", selection: $selectedProfileId) {
+                    ForEach(availableProfiles) { profile in
+                        Text(profile.displayName).tag(profile.id)
+                    }
+                }
+                .pickerStyle(.menu)
+
                 ChromeDebugRow(
                     status: chromeDebugStatus,
                     isRestarting: isRestartingChrome,
-                    onRestart: restartChromeWithDebugMode,
+                    hasClonedProfile: ChromeDebugHelper.shared.hasClonedProfile(),
+                    onSetup: setupChromeDebugMode,
                     onRefresh: refreshChromeStatus
                 )
             } header: {
                 Text("Google Meet Setup")
             } footer: {
-                Text("Google Meet requires Chrome to run with debug mode for focus-free muting. This allows WhisprMute to mute Meet without stealing focus from your current app.")
+                Text("WhisprMute clones your selected Chrome profile to enable debug mode. Your bookmarks and extensions will be copied. You may need to sign into Google Meet once.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -141,11 +165,25 @@ struct SettingsView: View {
         .padding()
     }
 
-    private func restartChromeWithDebugMode() {
+    private func setupChromeDebugMode() {
         isRestartingChrome = true
-        ChromeDebugHelper.shared.restartChromeWithDebugMode { success in
-            isRestartingChrome = false
-            refreshChromeStatus()
+
+        // Clone the selected profile first
+        DispatchQueue.global(qos: .userInitiated).async {
+            let cloneSuccess = ChromeDebugHelper.shared.cloneProfile(profileId: selectedProfileId)
+
+            DispatchQueue.main.async {
+                if cloneSuccess {
+                    // Now restart Chrome with debug mode
+                    ChromeDebugHelper.shared.restartChromeWithDebugMode { success in
+                        isRestartingChrome = false
+                        refreshChromeStatus()
+                    }
+                } else {
+                    isRestartingChrome = false
+                    print("[SettingsView] Failed to clone profile")
+                }
+            }
         }
     }
 
@@ -237,7 +275,8 @@ struct PermissionRow: View {
 struct ChromeDebugRow: View {
     let status: ChromeDebugHelper.ChromeDebugStatus
     let isRestarting: Bool
-    let onRestart: () -> Void
+    let hasClonedProfile: Bool
+    let onSetup: () -> Void
     let onRefresh: () -> Void
 
     var body: some View {
@@ -269,21 +308,25 @@ struct ChromeDebugRow: View {
                     .buttonStyle(.borderless)
                     .help("Refresh status")
 
-                    if status == .debugModeDisabled {
-                        Button("Restart Chrome") {
-                            onRestart()
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                    } else if status == .chromeNotRunning {
-                        Button("Launch Chrome") {
-                            onRestart()
+                    if status != .debugModeEnabled {
+                        Button(buttonTitle) {
+                            onSetup()
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
                     }
                 }
             }
+        }
+    }
+
+    private var buttonTitle: String {
+        if !hasClonedProfile {
+            return "Setup Debug Mode"
+        } else if status == .chromeNotRunning {
+            return "Launch Chrome"
+        } else {
+            return "Restart Chrome"
         }
     }
 
@@ -312,7 +355,11 @@ struct ChromeDebugRow: View {
         case .debugModeDisabled:
             return "Chrome needs to be restarted with debug mode"
         case .chromeNotRunning:
-            return "Launch Chrome with debug mode to enable Google Meet"
+            if hasClonedProfile {
+                return "Launch Chrome with debug mode to enable Google Meet"
+            } else {
+                return "Click Setup to clone your profile and enable debug mode"
+            }
         }
     }
 }

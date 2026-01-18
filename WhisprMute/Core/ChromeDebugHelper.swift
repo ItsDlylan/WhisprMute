@@ -1,12 +1,145 @@
 import Foundation
 import AppKit
 
+/// Represents a Chrome profile
+struct ChromeProfile: Identifiable, Hashable {
+    let id: String          // Folder name (e.g., "Default", "Profile 1")
+    let displayName: String // User-friendly name (e.g., "Dylan")
+
+    var isDefault: Bool { id == "Default" }
+}
+
 /// Helper for managing Chrome's debug mode for Google Meet integration
 class ChromeDebugHelper {
     static let shared = ChromeDebugHelper()
     private let cdpClient = CDPClient()
 
+    /// Path to Chrome's user data directory
+    private let chromeUserDataPath = NSHomeDirectory() + "/Library/Application Support/Google/Chrome"
+
+    /// Path to WhisprMute's debug profile directory
+    private let debugProfileBasePath = NSHomeDirectory() + "/Library/Application Support/WhisprMute/ChromeDebugProfile"
+
     private init() {}
+
+    // MARK: - Profile Discovery
+
+    /// Get available Chrome profiles from the Local State file
+    func getAvailableProfiles() -> [ChromeProfile] {
+        let localStatePath = chromeUserDataPath + "/Local State"
+
+        guard FileManager.default.fileExists(atPath: localStatePath),
+              let data = FileManager.default.contents(atPath: localStatePath),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let profile = json["profile"] as? [String: Any],
+              let infoCache = profile["info_cache"] as? [String: Any] else {
+            print("[ChromeDebugHelper] Could not read Chrome Local State file")
+            // Return default profile as fallback
+            return [ChromeProfile(id: "Default", displayName: "Default")]
+        }
+
+        var profiles: [ChromeProfile] = []
+
+        for (folderName, profileInfo) in infoCache {
+            if let info = profileInfo as? [String: Any] {
+                let displayName = (info["name"] as? String) ?? folderName
+                profiles.append(ChromeProfile(id: folderName, displayName: displayName))
+            }
+        }
+
+        // Sort with Default first, then alphabetically by display name
+        profiles.sort { lhs, rhs in
+            if lhs.isDefault { return true }
+            if rhs.isDefault { return false }
+            return lhs.displayName.localizedCaseInsensitiveCompare(rhs.displayName) == .orderedAscending
+        }
+
+        print("[ChromeDebugHelper] Found \(profiles.count) Chrome profiles")
+        return profiles.isEmpty ? [ChromeProfile(id: "Default", displayName: "Default")] : profiles
+    }
+
+    // MARK: - Profile Cloning
+
+    /// Clone essential profile files from source Chrome profile to debug directory
+    /// - Parameter profileId: The folder name of the profile to clone (e.g., "Default", "Profile 1")
+    /// - Returns: true if cloning was successful
+    @discardableResult
+    func cloneProfile(profileId: String) -> Bool {
+        let sourcePath = chromeUserDataPath + "/" + profileId
+        let destPath = debugProfileBasePath + "/Default"  // Always use "Default" in debug profile
+
+        print("[ChromeDebugHelper] Cloning profile '\(profileId)' to debug directory...")
+
+        // Verify source exists
+        guard FileManager.default.fileExists(atPath: sourcePath) else {
+            print("[ChromeDebugHelper] Source profile not found: \(sourcePath)")
+            return false
+        }
+
+        // Create destination directory
+        do {
+            // Remove existing debug profile
+            if FileManager.default.fileExists(atPath: debugProfileBasePath) {
+                try FileManager.default.removeItem(atPath: debugProfileBasePath)
+            }
+            try FileManager.default.createDirectory(atPath: destPath, withIntermediateDirectories: true)
+        } catch {
+            print("[ChromeDebugHelper] Failed to create debug profile directory: \(error)")
+            return false
+        }
+
+        // Essential files/folders to copy
+        let essentialItems = [
+            "Preferences",
+            "Secure Preferences",
+            "Bookmarks",
+            "Cookies",
+            "Login Data",
+            "Web Data",
+            "Extensions",
+            "Extension State",
+            "Local Extension Settings"
+        ]
+
+        var copiedCount = 0
+        for item in essentialItems {
+            let sourceItem = sourcePath + "/" + item
+            let destItem = destPath + "/" + item
+
+            if FileManager.default.fileExists(atPath: sourceItem) {
+                do {
+                    try FileManager.default.copyItem(atPath: sourceItem, toPath: destItem)
+                    copiedCount += 1
+                    print("[ChromeDebugHelper] Copied: \(item)")
+                } catch {
+                    print("[ChromeDebugHelper] Failed to copy \(item): \(error)")
+                }
+            }
+        }
+
+        // Also copy Local State to the base directory (needed for Chrome to recognize the profile)
+        let localStateSource = chromeUserDataPath + "/Local State"
+        let localStateDest = debugProfileBasePath + "/Local State"
+        if FileManager.default.fileExists(atPath: localStateSource) {
+            do {
+                try FileManager.default.copyItem(atPath: localStateSource, toPath: localStateDest)
+                print("[ChromeDebugHelper] Copied Local State")
+            } catch {
+                print("[ChromeDebugHelper] Failed to copy Local State: \(error)")
+            }
+        }
+
+        print("[ChromeDebugHelper] Profile clone complete. Copied \(copiedCount) items.")
+        return copiedCount > 0
+    }
+
+    /// Check if a cloned debug profile exists
+    func hasClonedProfile() -> Bool {
+        let profilePath = debugProfileBasePath + "/Default"
+        return FileManager.default.fileExists(atPath: profilePath)
+    }
+
+    // MARK: - Chrome Status
 
     /// Check if Chrome is currently running
     func isChromeRunning() -> Bool {
@@ -73,9 +206,9 @@ class ChromeDebugHelper {
     func launchChromeWithDebugMode(restoringURLs urls: [String] = [], completion: @escaping (Bool) -> Void) {
         let chromeExecutable = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
-        // Chrome requires a non-default user data directory for remote debugging
-        // We'll use the default Chrome profile location which allows it to use existing profile
-        let userDataDir = NSHomeDirectory() + "/Library/Application Support/Google/Chrome"
+        // Chrome 136+ requires a separate user data directory for remote debugging
+        // We use WhisprMute's cloned profile directory
+        let userDataDir = debugProfileBasePath
 
         // Build the command - launch Chrome directly with the debug flag
         var arguments = [
