@@ -51,6 +51,9 @@ struct SettingsView: View {
         hasAccessibilityPermission = checkAccessibilityPermission()
         hasCameraPermission = checkCameraPermission()
         hasMicrophonePermission = checkMicrophonePermission()
+
+        print("[Permissions] Accessibility: \(hasAccessibilityPermission), Camera: \(hasCameraPermission), Mic: \(hasMicrophonePermission)")
+        print("[Permissions] Camera status: \(AVCaptureDevice.authorizationStatus(for: .video).rawValue), Mic status: \(AVCaptureDevice.authorizationStatus(for: .audio).rawValue)")
     }
 
     private func refreshChromeStatus() {
@@ -271,8 +274,9 @@ struct SettingsView: View {
     }
 
     private func openAccessibilitySettings() {
-        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-        NSWorkspace.shared.open(url)
+        // Trigger the system prompt to add the app to Accessibility
+        let options = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true]
+        AXIsProcessTrustedWithOptions(options as CFDictionary)
     }
 
     private func openAutomationSettings() {
@@ -281,11 +285,25 @@ struct SettingsView: View {
     }
 
     private func checkCameraPermission() -> Bool {
-        return AVCaptureDevice.authorizationStatus(for: .video) == .authorized
+        let status = AVCaptureDevice.authorizationStatus(for: .video)
+        if status == .notDetermined {
+            // Request permission if not yet determined
+            AVCaptureDevice.requestAccess(for: .video) { _ in
+                DispatchQueue.main.async { self.refreshPermissions() }
+            }
+        }
+        return status == .authorized
     }
 
     private func checkMicrophonePermission() -> Bool {
-        return AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
+        let status = AVCaptureDevice.authorizationStatus(for: .audio)
+        if status == .notDetermined {
+            // Request permission if not yet determined
+            AVCaptureDevice.requestAccess(for: .audio) { _ in
+                DispatchQueue.main.async { self.refreshPermissions() }
+            }
+        }
+        return status == .authorized
     }
 
     private func openCameraSettings() {

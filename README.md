@@ -69,34 +69,37 @@ WhisprMute uses Discord's RPC API for native mute control. You'll need to set up
 
 Google Meet runs in Chrome and requires Chrome's DevTools Protocol for focus-free muting. This allows WhisprMute to mute Meet without stealing focus from your current app (critical for Wispr Flow to maintain input context).
 
-**Option 1: Use WhisprMute Settings (Recommended)**
+**Important:** Chrome 136+ blocks remote debugging on the default profile for security reasons. WhisprMute handles this by creating a separate debug profile with your data cloned.
+
+**Setup via WhisprMute Settings (Recommended)**
 
 1. Open WhisprMute Settings > Permissions tab
-2. Look for "Google Meet Setup" section
-3. Click "Restart Chrome" (or "Launch Chrome" if not running)
-4. WhisprMute will restart Chrome with debug mode enabled and restore your tabs
+2. Select your Chrome profile from the dropdown
+3. Click "Setup Debug Mode"
+4. Grant Camera and Microphone permissions when prompted
+5. WhisprMute will clone your profile (settings, bookmarks, passwords, history, extensions, login sessions) and launch Chrome with debug mode enabled
 
-**Option 2: Manual Setup**
+**What gets copied:**
+- Preferences and settings
+- Bookmarks
+- Saved passwords
+- Browsing history
+- Extensions
+- Cookies and login sessions
+- Autofill data
 
-Launch Chrome with the remote debugging flag:
-
-```bash
-open -a "Google Chrome" --args --remote-debugging-port=9222
-```
-
-Or create an alias in your shell profile (`~/.zshrc` or `~/.bashrc`):
-
-```bash
-alias chrome='open -a "Google Chrome" --args --remote-debugging-port=9222'
-```
-
-**Note:** Chrome must be launched with this flag each time for Google Meet muting to work without focus stealing. If Chrome is running without debug mode, WhisprMute will fall back to AppleScript (which briefly steals focus but restores it automatically).
+**Note:** Use the Chrome window launched by WhisprMute for Google Meet calls. Your regular Chrome can still run separately. If Chrome isn't in debug mode, WhisprMute will fall back to AppleScript (which briefly steals focus but restores it automatically).
 
 ### Required Permissions
 
-WhisprMute needs **Accessibility** permissions to function:
-- Go to System Settings > Privacy & Security > Accessibility
-- Add WhisprMute to the list
+WhisprMute needs several permissions to function. Open Settings > Permissions to see status and grant access:
+
+- **Accessibility**: Required to control mute buttons in meeting apps
+- **Automation**: Required to send commands to meeting apps
+- **Camera**: Required for Chrome debug mode (Google Meet video calls)
+- **Microphone**: Required for Chrome debug mode (Google Meet audio)
+
+The Settings > Permissions tab shows which permissions are granted (green checkmark) or missing (orange warning), with buttons to request each permission.
 
 ## Usage
 
@@ -154,10 +157,12 @@ WhisprMute/
 ### Google Meet not muting
 
 1. **Check Chrome debug mode**: Open WhisprMute Settings > Permissions and check if "Chrome Debug Mode" shows a green checkmark
-2. **Restart Chrome with debug mode**: Click "Restart Chrome" in the Settings > Permissions tab
-3. **Verify manually**: Open `http://localhost:9222/json` in your browser - you should see JSON listing your tabs
-4. **Check the Meet tab**: Make sure you're in an active Google Meet call (not just on the Meet homepage)
-5. **Fallback mode**: If Chrome isn't in debug mode, WhisprMute will use AppleScript which briefly steals focus - this is expected behavior
+2. **Setup debug profile**: Click "Setup Debug Mode" in Settings > Permissions to create the debug Chrome profile
+3. **Use the right Chrome**: Make sure you're using the Chrome window launched by WhisprMute, not your regular Chrome
+4. **Verify manually**: Open `http://localhost:9222/json` in the debug Chrome - you should see JSON listing your tabs
+5. **Check the Meet tab**: Make sure you're in an active Google Meet call (not just on the Meet homepage)
+6. **Grant permissions**: Ensure Camera and Microphone permissions are granted (green checkmarks in Settings > Permissions)
+7. **Fallback mode**: If Chrome isn't in debug mode, WhisprMute will use AppleScript which briefly steals focus - this is expected behavior
 
 ### Wispr Flow not detected
 

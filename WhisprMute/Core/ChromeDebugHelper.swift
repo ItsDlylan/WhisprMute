@@ -126,8 +126,59 @@ class ChromeDebugHelper {
         let firstRunPath = debugProfileBasePath + "/First Run"
         FileManager.default.createFile(atPath: firstRunPath, contents: nil)
 
+        // Strip download path from Preferences to avoid Downloads folder permission prompt
+        sanitizePreferences(at: destPath + "/Preferences")
+
         print("[ChromeDebugHelper] Debug profile created successfully")
         return true
+    }
+
+    /// Remove paths from Preferences that would trigger permission prompts
+    private func sanitizePreferences(at path: String) {
+        guard let data = FileManager.default.contents(atPath: path),
+              var json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            print("[ChromeDebugHelper] Could not read Preferences for sanitization")
+            return
+        }
+
+        var modified = false
+
+        // Remove download.default_directory
+        if var download = json["download"] as? [String: Any] {
+            if download["default_directory"] != nil {
+                download.removeValue(forKey: "default_directory")
+                json["download"] = download
+                modified = true
+                print("[ChromeDebugHelper] Removed download.default_directory")
+            }
+        }
+
+        // Remove savefile.default_directory
+        if var savefile = json["savefile"] as? [String: Any] {
+            if savefile["default_directory"] != nil {
+                savefile.removeValue(forKey: "default_directory")
+                json["savefile"] = savefile
+                modified = true
+                print("[ChromeDebugHelper] Removed savefile.default_directory")
+            }
+        }
+
+        // Remove selectfile.last_directory
+        if var selectfile = json["selectfile"] as? [String: Any] {
+            if selectfile["last_directory"] != nil {
+                selectfile.removeValue(forKey: "last_directory")
+                json["selectfile"] = selectfile
+                modified = true
+                print("[ChromeDebugHelper] Removed selectfile.last_directory")
+            }
+        }
+
+        if modified {
+            if let updatedData = try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted, .sortedKeys]) {
+                try? updatedData.write(to: URL(fileURLWithPath: path))
+                print("[ChromeDebugHelper] Preferences sanitized successfully")
+            }
+        }
     }
 
     /// Check if a cloned debug profile exists
